@@ -20,14 +20,15 @@ xhr.onload = function(){
     console.log(`Received status ${xhr.status} and response ${xhr.response} from server`)
     element.innerHTML = xhr.responseText
 } */
-fetch("/check", {
+fetch("/api", {
     method: "POST", 
     body: data
   }).then(res => {
     return res.text()
   }).then(function(data){
       console.log(data)
-      element.innerHTML=data
+      let response = JSON.parse(data)
+      element.innerHTML=response.message
   })
 
 function getDate(){

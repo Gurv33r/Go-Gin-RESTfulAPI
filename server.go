@@ -2,26 +2,27 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"isithalloween.com/server"
 )
 
+var err error
+
 func main() {
-	err := godotenv.Load(".env")
+	err = godotenv.Load(".env")
+	PORT := "8080"
 	if err != nil {
 		log.Println(".env file does not exist")
 	}
-	PORT := os.Getenv("PORT")
-	fmt.Println(PORT)
-
+	if envPORT := os.Getenv("PORT"); len(envPORT) > 0 {
+		PORT = envPORT
+	}
 	router := gin.Default()
 
 	router.Static("/", "./client")
@@ -32,23 +33,21 @@ func main() {
 }
 
 func receive(router *gin.Engine) {
-	router.POST("/check", halloweenCheck)
+	router.POST("/api", halloweenCheck)
 }
 
 func halloweenCheck(ctx *gin.Context) {
 	reqbody, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Request body reeading error:", err)
 	}
 	reqdate := &server.Date{Str: ""}
 	if err := json.Unmarshal(reqbody, &reqdate); err != nil {
-		log.Fatal(err)
+		log.Fatal("json unmarshaling error:", err)
 	}
-	log.Println("Data =", reqdate.Str)
-	monthAndDay := strings.Split(reqdate.Str, "-")[1:]
 	res := "No"
-	if strings.Compare(monthAndDay[0], "10") == 0 && strings.Compare(monthAndDay[1], "31") == 0 {
+	if server.IsHalloween(reqdate) {
 		res = "Yes"
 	}
-	ctx.String(http.StatusOK, res)
+	ctx.JSON(http.StatusOK, struct{ message string }{res})
 }
