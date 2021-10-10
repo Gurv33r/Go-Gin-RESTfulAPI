@@ -43,11 +43,11 @@ func halloweenCheck(ctx *gin.Context) {
 	}
 	reqdate := &server.Date{Str: ""}
 	if err := json.Unmarshal(reqbody, &reqdate); err != nil {
-		log.Fatal("json unmarshaling error:", err)
+		ctx.JSON(http.StatusBadRequest, server.Message{"Error 400, Bad Request"})
 	}
 	res := "No"
 	if server.IsHalloween(reqdate) {
 		res = "Yes"
 	}
-	ctx.JSON(http.StatusOK, struct{ message string }{res})
+	ctx.JSON(http.StatusOK, server.Message{res})
 }
