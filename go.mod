@@ -1,10 +1,10 @@
-module isithalloween.com
+module github.com/Gurv33r/Go-Gin-RESTfulAPI
 
 go 1.17
 
 require (
+	github.com/Gurv33r/go-env v0.3.0
 	github.com/gin-gonic/gin v1.7.4
-	github.com/joho/godotenv v1.3.0
 )
 
 require (
